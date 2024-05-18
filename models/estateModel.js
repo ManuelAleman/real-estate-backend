@@ -18,6 +18,11 @@ const estateSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Price is required"],
     },
+    type: {
+      type: String,
+      enum: ["venta", "renta"],
+      default: "venta",
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
