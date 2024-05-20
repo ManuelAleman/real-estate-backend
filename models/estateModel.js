@@ -28,9 +28,13 @@ const estateSchema = new mongoose.Schema(
       ref: "Category",
       required: [true, "Category is required"],
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "User is required"],
+    },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, "Seller is required"],
       ref: "Seller",
     },
     city: {

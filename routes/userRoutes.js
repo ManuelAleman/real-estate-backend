@@ -6,6 +6,8 @@ const {
   resetPasswordController,
   deleteProfileController,
   setVerifiedSellerController,
+  getVerifiedSellersController,
+  getUserInfoFromSeller,
 } = require("../controllers/userControllers");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -28,5 +30,11 @@ router.delete("/deleteUser/:id", authMiddleware, deleteProfileController);
 
 //(ADMIN) VERIFY SELLER / PUT
 router.put("/setVerifiedSeller", authMiddleware, setVerifiedSellerController);
+
+//GET VERIFIED SELLERS / GET
+router.get("/getVerifiedSellers", getVerifiedSellersController);
+
+//GET USER INFO FROM SELLER / POST
+router.get("/getUserInfoFromSeller", getUserInfoFromSeller);
 
 module.exports = router;

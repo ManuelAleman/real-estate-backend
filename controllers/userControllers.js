@@ -1,6 +1,6 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
-
+const sellerModel = require("../models/sellerModel");
 //GET USER INFO
 const getUserController = async (req, res) => {
   try {
@@ -180,7 +180,6 @@ const deleteProfileController = async (req, res) => {
 //ADMIN FEATURES
 const setVerifiedSellerController = async (req, res) => {
   try {
-    //find user
     const seller = await sellerModel.findById({ _id: req.body.user.id });
     if (!seller) {
       return res.status(404).send({
@@ -202,6 +201,65 @@ const setVerifiedSellerController = async (req, res) => {
   }
 };
 
+const getVerifiedSellersController = async (req, res) => {
+  try {
+    const sellers = await sellerModel
+      .find({ verified: true })
+      .populate("user")
+      .exec();
+
+    console.log(sellers);
+
+    if (!sellers.length) {
+      return res.status(404).send({
+        success: false,
+        message: "No verified sellers found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Verified Sellers",
+      sellers,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error in GET VERIFIED SELLERS API",
+      error,
+    });
+  }
+};
+
+const getUserInfoFromSeller = async (req, res) => {
+  try {
+    const user = await userModel.findById({ _id: req.body.id });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    //hinde password
+    user.password = undefined;
+    //resp
+    res.status(200).send({
+      success: true,
+      message: "User found",
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
+
 module.exports = {
   getUserController,
   updateUserController,
@@ -209,4 +267,6 @@ module.exports = {
   updatePasswordController,
   deleteProfileController,
   setVerifiedSellerController,
+  getVerifiedSellersController,
+  getUserInfoFromSeller,
 };

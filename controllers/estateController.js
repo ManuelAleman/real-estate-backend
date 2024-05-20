@@ -16,6 +16,7 @@ const createEstateController = async (req, res) => {
       price,
       type,
       category,
+      user,
       city,
       address,
       status,
@@ -29,6 +30,7 @@ const createEstateController = async (req, res) => {
       !description ||
       !price ||
       !category ||
+      !user ||
       !city ||
       !address ||
       !status ||
@@ -51,8 +53,8 @@ const createEstateController = async (req, res) => {
       });
     }
 
-    const seller_id = req.body.id;
-    const paths = await guardarImagenes(req.files.images, category, seller_id);
+    const seller = req.body.seller;
+    const paths = await guardarImagenes(req.files.images, category, user);
 
     const newEstate = new estateModel({
       name,
@@ -61,23 +63,14 @@ const createEstateController = async (req, res) => {
       price,
       type,
       category,
-      seller: seller_id,
+      user,
+      seller,
       city,
       address,
       status,
       characteristics,
       images: paths,
     });
-
-    //create a new seller instance for the user in case they dont want to have a verified seller
-    const newSeller = new sellerModel({
-      user: seller_id,
-      location: address,
-      city,
-      verified: false,
-    });
-
-    await newSeller.save();
 
     await newEstate.save();
     res.status(201).send({
