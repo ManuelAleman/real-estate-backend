@@ -22,8 +22,6 @@ const createEstateController = async (req, res) => {
       status,
     } = req.body;
 
-    const images = [];
-
     if (
       !name ||
       !presentationImg ||
@@ -53,7 +51,7 @@ const createEstateController = async (req, res) => {
       });
     }
 
-    const seller = req.body.seller;
+    const seller = req.body.seller || null;
     const paths = await guardarImagenes(req.files.images, category, user);
 
     const newEstate = new estateModel({
