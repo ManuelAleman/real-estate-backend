@@ -7,10 +7,6 @@ const sellerSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User is required"],
     },
-    location: {
-      type: String,
-      required: [true, "Location is required"],
-    },
     city: {
       type: String,
       required: [true, "City is required"],

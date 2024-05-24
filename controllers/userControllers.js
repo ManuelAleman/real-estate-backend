@@ -12,7 +12,6 @@ const getUserController = async (req, res) => {
         message: "User not found",
       });
     }
-
     //hinde password
     user.password = undefined;
     //resp
