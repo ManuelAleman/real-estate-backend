@@ -1,5 +1,6 @@
 const estateModel = require("../models/estateModel");
 const sellerModel = require("../models/sellerModel");
+const userModel = require("../models/userModel");
 const fs = require("fs");
 const path = require("path");
 //CREATE ESTATE
@@ -19,6 +20,7 @@ const createEstateController = async (req, res) => {
       user,
       city,
       address,
+      wantSeller,
       status,
     } = req.body;
 
@@ -54,6 +56,11 @@ const createEstateController = async (req, res) => {
     const seller = req.body.seller || null;
     const paths = await guardarImagenes(req.files.images, category, user);
 
+    const userInfo = await userModel.findById(user);
+    if (userInfo && userInfo.role !== "seller") {
+      await userModel.findByIdAndUpdate(user, { $set: { role: "seller" } });
+    }
+
     const newEstate = new estateModel({
       name,
       presentationImg,
@@ -63,6 +70,7 @@ const createEstateController = async (req, res) => {
       category,
       user,
       seller,
+      wantSeller,
       city,
       address,
       status,
@@ -148,8 +156,101 @@ const guardarImagenes = async (imagenes, category, seller) => {
   return paths;
 };
 
+const getEstatesFromUser = async (req, res) => {
+  try {
+    const estates = await estateModel.find({ user: req.params.id });
+
+    res.status(201).send({
+      success: true,
+      message: "Estates found",
+      estates,
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error getting estates",
+    });
+  }
+};
+
+const approveEstate = async (req, res) => {
+  try {
+    const estate = await estateModel.findById(req.params.id);
+    if (!estate) {
+      return res.status(404).send({
+        success: false,
+        message: "Estate not found",
+      });
+    }
+    estate.status = "approved";
+    await estate.save();
+    res.status(200).send({
+      success: true,
+      message: "Estate approved",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error approving estate",
+    });
+  }
+};
+
+const getNoApprovedEstates = async (req, res) => {
+  try {
+    const estates = await estateModel.find({ status: "waiting" });
+    res.status(200).send({
+      success: true,
+      estates,
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error getting estates",
+    });
+  }
+};
+
+const assignSellerController = async (req, res) => {
+  try {
+    console.log(req.body);
+    const seller = await sellerModel.findById(req.body.sellerId);
+    if (!seller) {
+      return res.status(404).send({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    const estate = await estateModel.findById(req.body.estateId);
+    if (!estate) {
+      return res.status(404).send({
+        success: false,
+        message: "Estate not found",
+      });
+    }
+
+    estate.seller = seller._id;
+    estate.wantSeller = false;
+    await estate.save();
+    res.status(200).send({
+      success: true,
+      message: "Seller assigned",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error assigning seller",
+    });
+  }
+};
+
 module.exports = {
   createEstateController,
   getEstateController,
   getEstateInfoController,
+  getEstatesFromUser,
+  approveEstate,
+  getNoApprovedEstates,
+  assignSellerController,
 };

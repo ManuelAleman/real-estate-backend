@@ -259,6 +259,30 @@ const getUserInfoFromSeller = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find({ role: "user" });
+    if (!users.length) {
+      return res.status(404).send({
+        success: false,
+        message: "No users found",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "All Users",
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error in GET ALL USERS API",
+      error,
+    });
+  }
+};
+
 module.exports = {
   getUserController,
   updateUserController,
@@ -268,4 +292,5 @@ module.exports = {
   setVerifiedSellerController,
   getVerifiedSellersController,
   getUserInfoFromSeller,
+  getAllUsers,
 };

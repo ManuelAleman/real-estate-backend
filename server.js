@@ -35,6 +35,7 @@ app.use("/categories", require("./routes/categoryRoutes"));
 app.use("/estates", require("./routes/estateRoutes"));
 app.use("/meetings", require("./routes/meetingRoutes"));
 app.use("/notifications", require("./routes/notificationRoutes"));
+app.use("/sellers", require("./routes/sellerRoutes"));
 
 app.get("/", (req, res) => {
   return res

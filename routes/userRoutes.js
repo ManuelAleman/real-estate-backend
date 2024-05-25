@@ -8,8 +8,10 @@ const {
   setVerifiedSellerController,
   getVerifiedSellersController,
   getUserInfoFromSeller,
+  getAllUsers,
 } = require("../controllers/userControllers");
 const authMiddleware = require("../middleware/authMiddleware");
+const { get } = require("mongoose");
 
 const router = express.Router();
 
@@ -36,5 +38,7 @@ router.get("/getVerifiedSellers", getVerifiedSellersController);
 
 //GET USER INFO FROM SELLER / POST
 router.get("/getUserInfoFromSeller", getUserInfoFromSeller);
+
+router.get("/getAllUsers", authMiddleware, getAllUsers);
 
 module.exports = router;

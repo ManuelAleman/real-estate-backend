@@ -5,7 +5,7 @@ const userModel = require("../models/userModel");
 const createSellerController = async (req, res) => {
   try {
     //find user
-    const user = await userModel.findById({ _id: req.body.id });
+    const user = await userModel.findById({ _id: req.body._id });
     if (!user) {
       return res.status(404).send({
         success: false,
@@ -13,9 +13,11 @@ const createSellerController = async (req, res) => {
       });
     }
 
-    //create seller
+    user.role = "seller";
+    await user.save();
     const { city } = req.body;
     const seller = new sellerModel({ user: user._id, city });
+    seller.verified = true;
     await seller.save();
     res.status(200).send({
       success: true,

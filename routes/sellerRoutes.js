@@ -5,11 +5,6 @@ const adminMiddleware = require("../middleware/adminMiddleware");
 
 const router = express.Router();
 
-router.post(
-  "/addSeller",
-  authMiddleware,
-  adminMiddleware,
-  createSellerController
-);
+router.post("/addSeller", authMiddleware, createSellerController);
 
 module.exports = router;

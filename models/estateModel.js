@@ -50,6 +50,10 @@ const estateSchema = new mongoose.Schema(
       required: [true, "Status is required"],
       default: "wating",
     },
+    wantSeller: {
+      type: Boolean,
+      default: false,
+    },
     characteristics: {
       type: [String],
       required: [true, "Characteristics are required"],
