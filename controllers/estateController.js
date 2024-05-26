@@ -1,18 +1,14 @@
 const estateModel = require("../models/estateModel");
 const sellerModel = require("../models/sellerModel");
 const userModel = require("../models/userModel");
+const categoryModel = require("../models/categoryModel");
 const fs = require("fs");
 const path = require("path");
 //CREATE ESTATE
 const createEstateController = async (req, res) => {
   try {
-    const characteristics = req.body.characteristics
-      .split(",")
-      .map((c) => c.trim());
-
     const {
       name,
-      presentationImg,
       description,
       price,
       type,
@@ -22,11 +18,17 @@ const createEstateController = async (req, res) => {
       address,
       wantSeller,
       status,
+      characteristics,
     } = req.body;
+
+    const presentationImg = req.files.presentationImg;
+    const images = req.files.images;
+
+    const presentationImgPath = "/uploads/" + presentationImg[0].filename;
+    const imagesPath = images.map((img) => "/uploads/" + img.filename);
 
     if (
       !name ||
-      !presentationImg ||
       !description ||
       !price ||
       !category ||
@@ -42,32 +44,25 @@ const createEstateController = async (req, res) => {
       });
     }
 
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded.");
-    }
-
-    if (req.files.images.length > characteristics.length * 2) {
-      return res.status(400).send({
+    const categoryExists = await categoryModel.find({ name: category });
+    if (!categoryExists) {
+      return res.status(404).send({
         success: false,
-        message: "Please upload min 2 images for each characteristic",
+        message: "Category not found",
       });
     }
 
-    const seller = req.body.seller || null;
-    const paths = await guardarImagenes(req.files.images, category, user);
+    const categoryId = categoryExists[0]._id;
 
-    const userInfo = await userModel.findById(user);
-    if (userInfo && userInfo.role !== "seller") {
-      await userModel.findByIdAndUpdate(user, { $set: { role: "seller" } });
-    }
+    const seller = req.body.seller || null;
 
     const newEstate = new estateModel({
       name,
-      presentationImg,
+      presentationImg: presentationImgPath,
       description,
       price,
       type,
-      category,
+      category: categoryId,
       user,
       seller,
       wantSeller,
@@ -75,10 +70,11 @@ const createEstateController = async (req, res) => {
       address,
       status,
       characteristics,
-      images: paths,
+      images: imagesPath,
     });
 
     await newEstate.save();
+
     res.status(201).send({
       success: true,
       message: "Estate created successfully",
@@ -127,33 +123,6 @@ const getEstateController = async (req, res) => {
       message: "Error getting estates",
     });
   }
-};
-
-const guardarImagenes = async (imagenes, category, seller) => {
-  const directorioSeller = "./images/seller/" + seller;
-
-  if (!fs.existsSync(directorioSeller)) {
-    fs.mkdirSync(directorioSeller, { recursive: true });
-  }
-
-  const casaId = Date.now().toString();
-
-  const directorioCasa = path.join(directorioSeller, casaId);
-
-  if (!fs.existsSync(directorioCasa)) {
-    fs.mkdirSync(directorioCasa);
-  }
-
-  const paths = [];
-
-  for (const imagen of imagenes) {
-    const nombreImagen = Date.now() + "_" + imagen.name;
-    const rutaImagen = path.join(directorioCasa, nombreImagen);
-    await imagen.mv(rutaImagen);
-    paths.push(rutaImagen);
-  }
-
-  return paths;
 };
 
 const getEstatesFromUser = async (req, res) => {

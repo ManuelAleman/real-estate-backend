@@ -11,9 +11,21 @@ const {
   assignSellerController,
 } = require("../controllers/estateController");
 
+const fields = [
+  { name: "presentationImg", maxCount: 1 },
+  { name: "images", maxCount: 60 },
+];
+
+const upload = require("../config/multerconfig");
+
 const router = express.Router();
 
-router.post("/createEstate", authMiddleware, createEstateController);
+router.post(
+  "/createEstate",
+  upload.fields(fields),
+  authMiddleware,
+  createEstateController
+);
 
 router.get("/getEstates", getEstateController);
 

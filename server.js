@@ -4,12 +4,14 @@ const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const connectDb = require("./config/db");
-const fileUpload = require("express-fileupload");
-
+const bodyParser = require("body-parser");
+const multer = require("multer");
 //dot en configuration
 dotenv.config();
 
 connectDb();
+
+const uplodad = multer({ dest: "uploads/" });
 
 //rest objects
 const app = express();
@@ -18,13 +20,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(
-  fileUpload({
-    useTempFiles: false,
-    tempFileDir: "./images/",
-  })
-);
+//file upload
 
 //route
 
