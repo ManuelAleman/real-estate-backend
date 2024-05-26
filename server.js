@@ -11,8 +11,6 @@ dotenv.config();
 
 connectDb();
 
-const uplodad = multer({ dest: "uploads/" });
-
 //rest objects
 const app = express();
 

@@ -24,8 +24,8 @@ const createEstateController = async (req, res) => {
     const presentationImg = req.files.presentationImg;
     const images = req.files.images;
 
-    const presentationImgPath = "/uploads/" + presentationImg[0].filename;
-    const imagesPath = images.map((img) => "/uploads/" + img.filename);
+    const presentationImgPath = "/images/" + presentationImg[0].filename;
+    const imagesPath = images.map((img) => "/images/" + img.filename);
 
     if (
       !name ||
@@ -113,6 +113,21 @@ const getEstateInfoController = async (req, res) => {
 const getEstateController = async (req, res) => {
   try {
     const estates = await estateModel.find();
+    res.status(200).send({
+      success: true,
+      estates,
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error getting estates",
+    });
+  }
+};
+
+const getEstatesApproved = async (req, res) => {
+  try {
+    const estates = await estateModel.find({ status: "approved" });
     res.status(200).send({
       success: true,
       estates,
@@ -222,4 +237,5 @@ module.exports = {
   approveEstate,
   getNoApprovedEstates,
   assignSellerController,
+  getEstatesApproved,
 };

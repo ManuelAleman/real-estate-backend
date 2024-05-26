@@ -9,6 +9,7 @@ const {
   approveEstate,
   getNoApprovedEstates,
   assignSellerController,
+  getEstatesApproved,
 } = require("../controllers/estateController");
 
 const fields = [
@@ -38,5 +39,7 @@ router.post("/approveEstate/:id", authMiddleware, approveEstate);
 router.get("/getNoApprovedEstates", authMiddleware, getNoApprovedEstates);
 
 router.put("/assignSeller", authMiddleware, assignSellerController);
+
+router.get("/getEstatesApproved", getEstatesApproved);
 
 module.exports = router;
