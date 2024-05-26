@@ -51,4 +51,32 @@ const getAllCategoryController = async (req, res) => {
   }
 };
 
-module.exports = { addCategoryController, getAllCategoryController };
+const getCategoryByIdController = async (req, res) => {
+  try {
+    const category = await categoryModel.findById(req.params.id);
+    if (!category) {
+      return res.status(404).send({
+        success: false,
+        message: "No category found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Category",
+      category,
+    });
+  } catch (error) {
+    console.log("error in get cat by id API");
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error in get category by id api",
+    });
+  }
+};
+
+module.exports = {
+  addCategoryController,
+  getAllCategoryController,
+  getCategoryByIdController,
+};

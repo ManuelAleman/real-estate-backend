@@ -3,6 +3,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const {
   addCategoryController,
   getAllCategoryController,
+  getCategoryByIdController,
 } = require("../controllers/categoryControllers");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
@@ -16,4 +17,6 @@ router.post(
 );
 
 router.get("/getAllCategory", authMiddleware, getAllCategoryController);
+
+router.get("/getCategoryById/:id", getCategoryByIdController);
 module.exports = router;

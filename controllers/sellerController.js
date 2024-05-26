@@ -33,4 +33,32 @@ const createSellerController = async (req, res) => {
   }
 };
 
-module.exports = { createSellerController };
+const getSellerById = async (req, res) => {
+  try {
+    const seller = await sellerModel
+      .findById(req.params.id)
+      .populate("user")
+      .exec();
+    if (!seller) {
+      return res.status(404).send({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Seller",
+      seller,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error in GET SELLER BY ID API",
+      error,
+    });
+  }
+};
+
+module.exports = { createSellerController, getSellerById };
