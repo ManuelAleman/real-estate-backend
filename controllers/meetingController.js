@@ -25,7 +25,9 @@ const createMeetingController = async (req, res) => {
       });
     }
 
-    if (estate.user == user_id) {
+    console.log(estate.user._id.toString());
+    console.log(user_id);
+    if (estate.user._id.toString() === user_id) {
       return res.status(400).send({
         success: false,
         message: "No puedes hacerte una cita tu solo",
