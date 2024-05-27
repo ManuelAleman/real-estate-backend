@@ -6,6 +6,8 @@ const {
   getMyMeetingInfo,
   getMeetingsWhereImSeller,
   updateMeetigStatus,
+  getMeetingWithNoSeller,
+  addSellerToMeeting,
 } = require("../controllers/meetingController");
 
 const router = express.Router();
@@ -23,5 +25,9 @@ router.get(
 );
 
 router.put("/updateMeetigStatus/:id", authMiddleware, updateMeetigStatus);
+
+router.get("/getMeetingWithNoSeller", authMiddleware, getMeetingWithNoSeller);
+
+router.put("/addSellerToMeeting/:id", authMiddleware, addSellerToMeeting);
 
 module.exports = router;

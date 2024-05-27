@@ -36,8 +36,6 @@ const createMeetingController = async (req, res) => {
 
     const waiting = seller == null ? true : false;
 
-    console.log("Waiting: ", waiting);
-
     const validDate = new Date(date);
     const currentDate = new Date();
 
@@ -127,7 +125,6 @@ const getMyMeetingInfo = async (req, res) => {
       });
     }
 
-    console.log("Meetings: ", meetings);
     res.status(200).send({
       success: true,
       message: "Meetings found",
@@ -208,10 +205,75 @@ const updateMeetigStatus = async (req, res) => {
   }
 };
 
+const getMeetingWithNoSeller = async (req, res) => {
+  try {
+    const meetings = await meetingModel
+      .find({ waitingSeller: true })
+      .populate("estate")
+      .populate({ path: "seller", populate: { path: "user" } })
+      .populate("user")
+      .exec();
+
+    if (meetings.length === 0) {
+      return res.status(404).send({
+        success: false,
+        message: "No meetings found",
+      });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Meetings found",
+      meetings,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
+
+const addSellerToMeeting = async (req, res) => {
+  try {
+    const meeting_id = req.params.id;
+    const seller_id = req.body.idSeller;
+    const meeting = await meetingModel.findById(meeting_id);
+
+    if (!meeting) {
+      return res.status(404).send({
+        success: false,
+        message: "Meeting not found",
+      });
+    }
+
+    meeting.seller = seller_id;
+    meeting.waitingSeller = false;
+    await meeting.save();
+
+    res.status(200).send({
+      success: true,
+      message: "Seller added to meeting",
+      meeting,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
+
 module.exports = {
   createMeetingController,
   getAllMeetingsFromUser,
   getMyMeetingInfo,
   getMeetingsWhereImSeller,
   updateMeetigStatus,
+  getMeetingWithNoSeller,
+  addSellerToMeeting,
 };

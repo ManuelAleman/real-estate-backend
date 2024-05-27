@@ -197,7 +197,6 @@ const getNoApprovedEstates = async (req, res) => {
 
 const assignSellerController = async (req, res) => {
   try {
-    console.log(req.body);
     const seller = await sellerModel.findById(req.body.sellerId);
     if (!seller) {
       return res.status(404).send({
