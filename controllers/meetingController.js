@@ -25,6 +25,13 @@ const createMeetingController = async (req, res) => {
       });
     }
 
+    if (estate.user == user_id) {
+      return res.status(400).send({
+        success: false,
+        message: "No puedes hacerte una cita tu solo",
+      });
+    }
+
     const seller = req.body.seller || estate.seller;
 
     const waiting = seller == null ? true : false;
@@ -121,6 +128,40 @@ const getMyMeetingInfo = async (req, res) => {
     }
 
     console.log("Meetings: ", meetings);
+    res.status(200).send({
+      success: true,
+      message: "Meetings found",
+      meetings,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
+
+const getMeetingsWhereImSeller = async (req, res) => {
+  try {
+    const seller_id = req.params.id;
+    const meetings = await meetingModel
+      .find({
+        seller: seller_id,
+        waitingSeller: false,
+      })
+      .populate("estate")
+      .populate({ path: "seller", populate: { path: "user" } })
+      .populate("user")
+      .exec();
+
+    if (meetings.length === 0) {
+      return res.status(404).send({
+        success: false,
+        message: "No meetings found",
+      });
+    }
 
     res.status(200).send({
       success: true,
@@ -137,8 +178,40 @@ const getMyMeetingInfo = async (req, res) => {
   }
 };
 
+const updateMeetigStatus = async (req, res) => {
+  try {
+    const meeting_id = req.params.id;
+    const status = req.body.status;
+    const meeting = await meetingModel.findById(meeting_id);
+    if (!meeting) {
+      return res.status(404).send({
+        success: false,
+        message: "Meeting not found",
+      });
+    }
+
+    meeting.status = status;
+    await meeting.save();
+
+    res.status(200).send({
+      success: true,
+      message: "Meeting updated",
+      meeting,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error,
+    });
+  }
+};
+
 module.exports = {
   createMeetingController,
   getAllMeetingsFromUser,
   getMyMeetingInfo,
+  getMeetingsWhereImSeller,
+  updateMeetigStatus,
 };
