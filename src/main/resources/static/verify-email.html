@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Email - Real Estate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .loading { color: #667eea; }
+        
+        h1 {
+            color: #1f2937;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            color: #6b7280;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-details {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        
+        .error-details code {
+            color: #dc2626;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="content">
+        <div class="spinner"></div>
+        <h1>Verificando tu email...</h1>
+        <p>Por favor espera un momento</p>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        const container = document.getElementById('content');
+
+        if (!token) {
+            container.innerHTML = `
+                <div class="icon error">❌</div>
+                <h1>Token no encontrado</h1>
+                <p>El enlace de verificación es inválido. Por favor, verifica que hayas copiado el enlace completo.</p>
+                <a href="/" class="button">Ir al inicio</a>
+            `;
+        } else {
+            fetch(`http://localhost:8080/auth/verify-email?token=${token}`)
+                .then(response => {
+                    const status = response.status;
+                    
+                    return response.json().then(data => {
+                        return { status, data };
+                    });
+                })
+                .then(({ status, data }) => {
+                    if (status === 200) {
+                        if (data.error === "Already Verified") {
+                            container.innerHTML = `
+                                <div class="icon" style="color: #3b82f6;">ℹ️</div>
+                                <h1>Email Ya Verificado</h1>
+                                <p>${data.message}</p>
+                                <p style="color: #3b82f6; margin-top: 15px;">No necesitas hacer nada más, tu cuenta está activa.</p>
+                                <a href="#login" class="button">Ir a Login</a>
+                            `;
+                        } else {
+                            container.innerHTML = `
+                                <div class="icon success">✅</div>
+                                <h1>¡Email Verificado!</h1>
+                                <p>${data.message || 'Tu cuenta ha sido verificada exitosamente. Ya puedes iniciar sesión.'}</p>
+                                <a href="#login" class="button">Ir a Login</a>
+                            `;
+                        }
+                    } else if (status === 410) {
+                        container.innerHTML = `
+                            <div class="icon error">⏰</div>
+                            <h1>Enlace Expirado</h1>
+                            <p>${data.message}</p>
+                            <div class="error-details">
+                                <strong>¿Qué hacer?</strong><br>
+                                Los enlaces de verificación expiran después de 24 horas por seguridad.<br>
+                                Puedes solicitar un nuevo enlace de verificación.
+                            </div>
+                            <br>
+                            <button class="button" onclick="resendEmail()">Reenviar Email de Verificación</button>
+                        `;
+                    } else if (status === 404) {
+                        container.innerHTML = `
+                            <div class="icon error">❌</div>
+                            <h1>Token Inválido</h1>
+                            <p>${data.message}</p>
+                            <div class="error-details">
+                                <strong>Posibles causas:</strong><br>
+                                • El enlace es incorrecto o está incompleto<br>
+                                • El token ya fue utilizado<br>
+                                • El enlace no existe en nuestro sistema
+                            </div>
+                            <br>
+                            <button class="button" onclick="resendEmail()">Solicitar Nuevo Enlace</button>
+                        `;
+                    } else {
+                        // Otro error
+                        container.innerHTML = `
+                            <div class="icon error">❌</div>
+                            <h1>Error al Verificar</h1>
+                            <p>${data.message}</p>
+                            <div class="error-details">
+                                <strong>Código de error:</strong> ${status}<br>
+                                <strong>Descripción:</strong> ${data.error}
+                            </div>
+                            <br>
+                            <button class="button" onclick="resendEmail()">Reenviar Email</button>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    // Error de red o del servidor
+                    container.innerHTML = `
+                        <div class="icon error">❌</div>
+                        <h1>Error de Conexión</h1>
+                        <p>No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.</p>
+                        <div class="error-details">
+                            <code>${error.message}</code>
+                        </div>
+                        <br>
+                        <button class="button" onclick="location.reload()">Reintentar</button>
+                    `;
+                });
+        }
+
+        function resendEmail() {
+            const email = prompt('Ingresa tu email para reenviar la verificación:');
+            if (email) {
+                fetch('http://localhost:8080/auth/resend-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
