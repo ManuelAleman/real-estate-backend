@@ -54,7 +54,7 @@ public class EmailVerificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid verification token. Please request a new one."));
 
         if (verificationToken.isVerified()) {
-            throw new AlreadyVerifiedException("Tu email ya ha sido verificado anteriormente. ¡Ya puedes iniciar sesión!");
+            throw new AlreadyVerifiedException("Your email has already been verified. You can log in now!");
         }
 
         if (verificationToken.isExpired()) {
@@ -80,7 +80,7 @@ public class EmailVerificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (user.isEmailVerified()) {
-            throw new AlreadyVerifiedException("Tu email ya está verificado. ¡Ya puedes iniciar sesión!");
+            throw new AlreadyVerifiedException("Email is already verified. You can log in.");
         }
 
         createAndSendVerificationToken(user);

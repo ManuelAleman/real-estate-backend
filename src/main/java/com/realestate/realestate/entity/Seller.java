@@ -58,7 +58,7 @@ public class Seller {
     @Column(nullable = false)
     private Double rating = 5.0;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "TEXT")
     private String verificationDocuments;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
