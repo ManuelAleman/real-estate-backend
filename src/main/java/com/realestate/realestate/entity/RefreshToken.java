@@ -7,7 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "refresh_tokens")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

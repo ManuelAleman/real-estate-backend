@@ -1,4 +1,4 @@
-package com.realestate.realestate.exception;
+package com.realestate.realestate.exception.auth;
 
 public class TokenExpiredException extends RuntimeException {
     public TokenExpiredException(String message) {

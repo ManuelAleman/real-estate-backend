@@ -14,6 +14,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import com.realestate.realestate.dto.error.ErrorResponse;
+import com.realestate.realestate.exception.auth.AlreadyVerifiedException;
+import com.realestate.realestate.exception.auth.EmailNotVerifiedException;
+import com.realestate.realestate.exception.auth.TokenExpiredException;
+import com.realestate.realestate.exception.common.DuplicateResourceException;
+import com.realestate.realestate.exception.common.ResourceNotFoundException;
+import com.realestate.realestate.exception.seller.InvalidSellerStatusException;
+import com.realestate.realestate.exception.seller.SellerAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,6 +111,40 @@ public class GlobalExceptionHandler {
         );
         
         return new ResponseEntity<>(error, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(SellerAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleSellerAlreadyExists(
+            SellerAlreadyExistsException ex, 
+            WebRequest request) {
+        
+        log.warn("Seller already exists: {}", ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.CONFLICT.value(),
+            "Seller Already Exists",
+            ex.getMessage(),
+            getPath(request)
+        );
+        
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidSellerStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSellerStatus(
+            InvalidSellerStatusException ex, 
+            WebRequest request) {
+        
+        log.warn("Invalid seller status: {}", ex.getMessage());
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Invalid Status",
+            ex.getMessage(),
+            getPath(request)
+        );
+        
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

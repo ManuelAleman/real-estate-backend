@@ -1,4 +1,4 @@
-package com.realestate.realestate.exception;
+package com.realestate.realestate.exception.common;
 
 public class DuplicateResourceException extends RuntimeException {
     public DuplicateResourceException(String message) {

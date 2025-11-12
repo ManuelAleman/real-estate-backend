@@ -8,7 +8,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "estate_characteristics")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

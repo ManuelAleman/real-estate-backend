@@ -3,15 +3,14 @@ package com.realestate.realestate.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realestate.realestate.entity.EmailVerificationToken;
 import com.realestate.realestate.entity.User;
-import com.realestate.realestate.exception.AlreadyVerifiedException;
-import com.realestate.realestate.exception.ResourceNotFoundException;
-import com.realestate.realestate.exception.TokenExpiredException;
+import com.realestate.realestate.exception.auth.AlreadyVerifiedException;
+import com.realestate.realestate.exception.common.ResourceNotFoundException;
+import com.realestate.realestate.exception.auth.TokenExpiredException;
 import com.realestate.realestate.repository.EmailVerificationTokenRepository;
 import com.realestate.realestate.repository.UserRepository;
 

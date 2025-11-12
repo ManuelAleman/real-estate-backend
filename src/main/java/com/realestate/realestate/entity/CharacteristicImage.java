@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "characteristic_images")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

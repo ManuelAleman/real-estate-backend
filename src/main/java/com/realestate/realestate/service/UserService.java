@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realestate.realestate.dto.user.UserResponse;
 import com.realestate.realestate.entity.User;
 import com.realestate.realestate.enums.RoleName;
-import com.realestate.realestate.exception.ResourceNotFoundException;
+import com.realestate.realestate.exception.common.ResourceNotFoundException;
 import com.realestate.realestate.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

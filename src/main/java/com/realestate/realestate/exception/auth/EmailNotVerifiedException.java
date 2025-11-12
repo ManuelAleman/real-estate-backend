@@ -1,4 +1,4 @@
-package com.realestate.realestate.exception;
+package com.realestate.realestate.exception.auth;
 
 public class EmailNotVerifiedException extends RuntimeException {
     public EmailNotVerifiedException(String message) {

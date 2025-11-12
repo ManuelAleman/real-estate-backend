@@ -12,10 +12,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "sellers")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"user", "estates", "meetings"})
+@ToString(exclude = {"user", "estates", "meetings"})
 public class Seller {
 
     @Id
@@ -28,6 +31,18 @@ public class Seller {
 
     @Column(nullable = false)
     private String city;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = true, length = 100)
+    private String companyName;
+
+    @Column(nullable = true, length = 50)
+    private String licenseNumber;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
