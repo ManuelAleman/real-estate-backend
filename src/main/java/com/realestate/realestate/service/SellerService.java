@@ -8,12 +8,15 @@ import com.realestate.realestate.dto.seller.SellerApplicationRequest;
 import com.realestate.realestate.dto.seller.SellerResponse;
 import com.realestate.realestate.dto.seller.SellerStatusResponse;
 import com.realestate.realestate.dto.seller.VerifySellerRequest;
+import com.realestate.realestate.entity.Role;
 import com.realestate.realestate.entity.Seller;
 import com.realestate.realestate.entity.User;
+import com.realestate.realestate.enums.RoleName;
 import com.realestate.realestate.enums.SellerStatus;
 import com.realestate.realestate.exception.common.ResourceNotFoundException;
 import com.realestate.realestate.exception.seller.InvalidSellerStatusException;
 import com.realestate.realestate.exception.seller.SellerAlreadyExistsException;
+import com.realestate.realestate.repository.RoleRepository;
 import com.realestate.realestate.repository.SellerRepository;
 import com.realestate.realestate.repository.UserRepository;
 
@@ -27,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SellerService {
     private final UserRepository userRepository;
     private final SellerRepository sellerRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional
     public void applyToBecomeSeller(String userEmail, SellerApplicationRequest request) {
@@ -100,6 +104,13 @@ public class SellerService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public SellerResponse getSellerById(Long sellerId) {
+        Seller seller = sellerRepository.findById(sellerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Seller not found"));
+        return buildSellerResponse(seller);
+    }
+
     @Transactional
     public void verifySeller(Long sellerId, VerifySellerRequest request) {
         Seller seller = sellerRepository.findById(sellerId)
@@ -112,6 +123,15 @@ public class SellerService {
         if (request.getApproved()) {
             seller.setStatus(SellerStatus.APPROVED);
             seller.setVerifiedAt(java.time.LocalDateTime.now());
+            
+            User user = seller.getUser();
+            Role sellerRole = roleRepository.findByName(RoleName.SELLER)
+                    .orElseThrow(() -> new ResourceNotFoundException("SELLER role not found"));
+            
+            user.getRoles().add(sellerRole);
+            userRepository.save(user);
+            
+            log.info("SELLER role added to user {}", user.getEmail());
         } else {
             seller.setStatus(SellerStatus.REJECTED);
         }

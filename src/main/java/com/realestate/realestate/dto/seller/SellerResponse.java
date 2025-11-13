@@ -33,6 +33,5 @@ public class SellerResponse {
     private LocalDateTime verifiedAt;
     private LocalDateTime createdAt;
     
-    // Para admins (opcional, se puede omitir en respuestas públicas)
     private String verificationNotes;
 }

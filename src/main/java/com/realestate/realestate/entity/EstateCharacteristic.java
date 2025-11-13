@@ -1,8 +1,5 @@
 package com.realestate.realestate.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +23,6 @@ public class EstateCharacteristic {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "characteristic", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CharacteristicImage> images = new ArrayList<>();
+    @Column(nullable = false)
+    private String value;
 }

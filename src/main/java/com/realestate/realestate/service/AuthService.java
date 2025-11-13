@@ -32,9 +32,11 @@ import com.realestate.realestate.security.CustomUserDetailsService;
 import com.realestate.realestate.security.JwtService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -64,28 +66,26 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .contactNumber(request.getContactNumber())
                 .enabled(true)
-                .emailVerified(false) 
+                .emailVerified(false)
                 .roles(new HashSet<>(Set.of(userRole)))
                 .build();
-        
+
         user = userRepository.save(user);
-        
+
         emailVerificationService.createAndSendVerificationToken(user);
     }
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userRepository.findByEmailWithRoles(request.getEmail())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!user.isEmailVerified()) {
             throw new EmailNotVerifiedException(
-                "Please verify your email before logging in. Check your inbox for the verification link."
-            );
+                    "Please verify your email before logging in. Check your inbox for the verification link.");
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
@@ -136,12 +136,12 @@ public class AuthService {
     }
 
     private AuthResponse buildAuthResponse(User user, String accessToken, String refreshToken) {
-        Set<RoleName> roleNames = user.getRoles() != null 
-            ? user.getRoles().stream()
-                    .map(role -> role.getName())
-                    .collect(Collectors.toSet())
-            : new HashSet<>();
-        
+        Set<RoleName> roleNames = user.getRoles() != null
+                ? user.getRoles().stream()
+                        .map(role -> role.getName())
+                        .collect(Collectors.toSet())
+                : new HashSet<>();
+
         UserResponse userResponse = UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())

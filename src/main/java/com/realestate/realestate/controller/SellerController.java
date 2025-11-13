@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realestate.realestate.dto.auth.MessageResponse;
 import com.realestate.realestate.dto.seller.SellerApplicationRequest;
+import com.realestate.realestate.dto.seller.SellerResponse;
 import com.realestate.realestate.dto.seller.SellerStatusResponse;
 import com.realestate.realestate.service.SellerService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/sellers")
@@ -46,4 +49,12 @@ public class SellerController {
         SellerStatusResponse status = sellerService.getApplicationStatus(userDetails.getUsername());
         return ResponseEntity.ok(status);
     }
+
+    @GetMapping("/{sellerId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<SellerResponse> getSellerById(@PathVariable Long sellerId) {
+        SellerResponse seller = sellerService.getSellerById(sellerId);
+        return ResponseEntity.ok(seller);
+    }
+    
 }
