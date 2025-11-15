@@ -247,8 +247,6 @@ public class EstateService {
                 return buildEstateResponse(rejectedEstate);
         }
 
-        // ==================== PRIVATE HELPER METHODS ====================
-
         private EstateResponse buildEstateResponse(Estate estate) {
                 List<EstateResponse.EstateImageResponse> imageResponses = estate.getImages().stream()
                                 .map(img -> EstateResponse.EstateImageResponse.builder()
@@ -268,6 +266,11 @@ public class EstateService {
 
                 SellerResponse sellerResponse = SellerResponse.builder()
                                 .id(estate.getSeller().getId())
+                                .userId(estate.getSeller().getUser().getId())
+                                .userName(estate.getSeller().getUser().getName().concat(" ").concat(estate.getSeller().getUser().getLastName()))
+                                .userEmail(estate.getSeller().getUser().getEmail())
+                                .userPhone(estate.getSeller().getUser().getContactNumber())
+                                .userProfilePicture(estate.getSeller().getUser().getProfilePicture())
                                 .city(estate.getSeller().getCity())
                                 .address(estate.getSeller().getAddress())
                                 .companyName(estate.getSeller().getCompanyName())

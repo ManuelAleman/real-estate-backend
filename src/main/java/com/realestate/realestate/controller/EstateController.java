@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,6 @@ import com.realestate.realestate.service.EstateService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/estates")
@@ -91,14 +91,14 @@ public class EstateController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/sold")
+    @PatchMapping("/{id}/sold")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<EstateResponse> markAsSold(@PathVariable Long id) {
         EstateResponse response = estateService.markEstateAsSold(id);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/rented")
+    @PatchMapping("/{id}/rented")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<EstateResponse> markAsRented(@PathVariable Long id) {
         EstateResponse response = estateService.markEstateAsRented(id);
@@ -114,14 +114,14 @@ public class EstateController {
         return ResponseEntity.ok(estates);
     }
 
-    @PutMapping("/{id}/approve")
+    @PatchMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EstateResponse> approveEstate(@PathVariable Long id) {
         EstateResponse estateResponse = estateService.approveEstate(id);
         return ResponseEntity.ok(estateResponse);
     }
 
-    @PutMapping("/{id}/reject")
+    @PatchMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EstateResponse> rejectEstate(@PathVariable Long id) {
         EstateResponse estateResponse = estateService.rejectEstate(id);
