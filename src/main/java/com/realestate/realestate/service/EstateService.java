@@ -31,6 +31,7 @@ import com.realestate.realestate.repository.CategoryRepository;
 import com.realestate.realestate.repository.EstateRepository;
 import com.realestate.realestate.repository.SellerRepository;
 import com.realestate.realestate.repository.UserRepository;
+import com.realestate.realestate.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,12 +83,9 @@ public class EstateService {
         public EstateResponse createEstate(CreateEstateRequest request) {
                 log.info("Creating estate with name: {}", request.getName());
 
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                String email = authentication.getName();
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                User currUser = SecurityUtil.getCurrentUser();
 
-                Seller seller = sellerRepository.findByUser(user)
+                Seller seller = sellerRepository.findByUser(currUser)
                                 .orElseThrow(() -> new ResourceNotFoundException("Seller profile not found for user"));
 
                 Category category = categoryRepository.findById(request.getCategoryId())
@@ -137,12 +135,9 @@ public class EstateService {
         @Transactional(readOnly = true)
         public Page<EstateResponse> getMyEstates(int page, int size) {
                 log.info("Fetching my estates - page: {}, size: {}", page, size);
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                String email = authentication.getName();
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                User currUser = SecurityUtil.getCurrentUser();
 
-                Seller seller = sellerRepository.findByUser(user)
+                Seller seller = sellerRepository.findByUser(currUser)
                                 .orElseThrow(() -> new ResourceNotFoundException("Seller profile not found for user"));
 
                 Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
