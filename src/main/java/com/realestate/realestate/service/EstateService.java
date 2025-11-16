@@ -258,7 +258,7 @@ public class EstateService {
                 return buildEstateResponse(rejectedEstate);
         }
 
-        private EstateResponse buildEstateResponse(Estate estate) {
+        EstateResponse buildEstateResponse(Estate estate) {
                 List<EstateResponse.EstateImageResponse> imageResponses = estate.getImages().stream()
                                 .map(img -> EstateResponse.EstateImageResponse.builder()
                                                 .id(img.getId())
