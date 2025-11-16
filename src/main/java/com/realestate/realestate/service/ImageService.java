@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class ImageService {
 
     private final S3Presigner s3Presigner;
+    private final software.amazon.awssdk.services.s3.S3Client s3Client;
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
@@ -98,13 +99,47 @@ public class ImageService {
         return generatePresignedUrls(count, contentType, "estates");
     }
 
+    /**
+     * Elimina una imagen de S3 dado su URL
+     * 
+     * @param fileUrl URL completa del archivo en S3
+     */
     public void deleteImage(String fileUrl) {
         try {
             String key = extractKeyFromUrl(fileUrl);
-            log.info("Image deletion not implemented yet for key: {}", key);
-            // TODO: Implementar eliminación con S3Client cuando sea necesario
+            if (key.isEmpty()) {
+                log.warn("Could not extract key from URL: {}", fileUrl);
+                return;
+            }
+
+            s3Client.deleteObject(builder -> builder
+                    .bucket(bucketName)
+                    .key(key)
+                    .build());
+            
+            log.info("Successfully deleted image from S3: {}", key);
         } catch (Exception e) {
-            log.error("Error deleting image: {}", fileUrl, e);
+            log.error("Error deleting image from S3: {}", fileUrl, e);
+            throw new RuntimeException("Failed to delete image from S3", e);
+        }
+    }
+
+    /**
+     * Elimina múltiples imágenes de S3
+     * 
+     * @param fileUrls Lista de URLs de archivos a eliminar
+     */
+    public void deleteImages(List<String> fileUrls) {
+        if (fileUrls == null || fileUrls.isEmpty()) {
+            return;
+        }
+
+        for (String url : fileUrls) {
+            try {
+                deleteImage(url);
+            } catch (Exception e) {
+                log.error("Failed to delete image, continuing with others: {}", url);
+            }
         }
     }
 

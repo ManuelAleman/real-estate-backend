@@ -44,6 +44,7 @@ public class EstateService {
         private final CategoryRepository categoryRepository;
         private final SellerRepository sellerRepository;
         private final UserRepository userRepository;
+        private final ImageService imageService;
 
         @Transactional(readOnly = true)
         public Page<EstateResponse> getAllEstates(int page, int size) {
@@ -154,8 +155,18 @@ public class EstateService {
                 log.info("Deleting estate with id: {}", id);
                 Estate estate = estateRepository.findById(id)
                                 .orElseThrow(() -> new ResourceNotFoundException("Estate not found with id: " + id));
+                
+                if (estate.getImages() != null && !estate.getImages().isEmpty()) {
+                        List<String> imageUrls = estate.getImages().stream()
+                                        .map(EstateImage::getS3url)
+                                        .collect(Collectors.toList());
+                        
+                        log.info("Deleting {} images from S3 for estate id: {}", imageUrls.size(), id);
+                        imageService.deleteImages(imageUrls);
+                }
+                
                 estateRepository.delete(estate);
-                log.info("Estate deleted successfully with id: {}", id);
+                log.info("Estate and associated images deleted successfully with id: {}", id);
         }
 
         @Transactional
