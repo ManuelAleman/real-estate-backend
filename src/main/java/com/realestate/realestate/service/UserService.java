@@ -10,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realestate.realestate.dto.user.UserResponse;
 import com.realestate.realestate.entity.User;
 import com.realestate.realestate.enums.RoleName;
-import com.realestate.realestate.exception.common.ResourceNotFoundException;
-import com.realestate.realestate.repository.UserRepository;
+import com.realestate.realestate.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-
-    private final UserRepository userRepository;
-
+    private final SecurityUtil securityUtil;
     @Transactional(readOnly = true)
-    public UserResponse getCurrentUser(String email) {
-        log.debug("Getting current user by email: {}", email);
-        
-        User user = userRepository.findByEmailWithRoles(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
+    public UserResponse getCurrentUser() {
+        User user = securityUtil.getCurrentUser();
         return buildUserResponse(user);
     }
 

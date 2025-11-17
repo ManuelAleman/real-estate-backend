@@ -1,8 +1,6 @@
 package com.realestate.realestate.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,9 +59,8 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        
-        UserResponse user = userService.getCurrentUser(userDetails.getUsername());
+            ) {
+        UserResponse user = userService.getCurrentUser();
         return ResponseEntity.ok(user);
     }
 

@@ -18,8 +18,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"roles", "seller", "meetings", "sentNotifications", "receivedNotifications", "refreshTokens"})
-@ToString(exclude = {"roles", "seller", "meetings", "sentNotifications", "receivedNotifications", "refreshTokens"})
+@EqualsAndHashCode(exclude = {"roles", "seller", "appointments", "sentNotifications", "receivedNotifications", "refreshTokens"})
+@ToString(exclude = {"roles", "seller", "appointments", "sentNotifications", "receivedNotifications", "refreshTokens"})
 public class User {
 
     @Id
@@ -73,9 +73,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Seller seller;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Meeting> meetings = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

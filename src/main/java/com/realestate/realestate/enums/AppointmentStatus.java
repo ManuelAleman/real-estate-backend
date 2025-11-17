@@ -1,8 +1,9 @@
 package com.realestate.realestate.enums;
 
-public enum MeetingStatus {
-    WAITING,
+public enum AppointmentStatus {
+    PENDING,
     CONFIRMED,
     CANCELLED,
-    COMPLETED
+    COMPLETED,
+    REJECTED
 }

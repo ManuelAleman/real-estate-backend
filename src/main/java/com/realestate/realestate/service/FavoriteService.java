@@ -1,7 +1,5 @@
 package com.realestate.realestate.service;
 
-import java.util.DuplicateFormatFlagsException;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +31,13 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final EstateRepository estateRepository;
     private final EstateService estateService;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public FavoriteResponse addToFavorites(Long estateId) {
         log.info("Adding estate {} to favorites", estateId);
 
-        User currentUser = SecurityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
         Estate estate = estateRepository.findById(estateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estate not found with id: " + estateId));
 
@@ -65,7 +64,7 @@ public class FavoriteService {
     public void removeFromFavorites(Long estateId) {
         log.info("Removing estate {} from favorites", estateId);
 
-        User currentUser = SecurityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
 
         Estate estate = estateRepository.findById(estateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estate not found with id: " + estateId));
@@ -81,7 +80,7 @@ public class FavoriteService {
     public Page<FavoriteResponse> getMyFavorites(int page, int size) {
         log.info("Fetching user favorites - page: {}, size: {}", page, size);
 
-        User currentUser = SecurityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Page<Favorite> favorites = favoriteRepository.findByUserOrderByCreatedAtDesc(currentUser, pageable);
@@ -93,7 +92,7 @@ public class FavoriteService {
     public FavoriteCheckResponse isFavorite(Long estateId) {
         log.info("Checking if estate {} is in favorites", estateId);
 
-        User currentUser = SecurityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
         Estate estate = estateRepository.findById(estateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estate not found with id: " + estateId));
         Boolean isFavorite = favoriteRepository.existsByUserAndEstate(currentUser, estate);
@@ -104,7 +103,7 @@ public class FavoriteService {
     public FavoriteCountResponse countMyFavorites() {
         log.info("Counting user favorites");
 
-        User currentUser = SecurityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
         Long count = favoriteRepository.countByUser(currentUser);
         return buildFavoriteCountResponse(count);
     }

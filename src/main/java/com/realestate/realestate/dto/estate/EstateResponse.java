@@ -21,7 +21,7 @@ public class EstateResponse {
     private Long id;
     private String name;
     private String description;
-    private double price;
+    private Double price;
     private EstateType type; 
     private EstateStatus status; 
     

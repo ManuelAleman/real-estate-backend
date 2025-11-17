@@ -17,8 +17,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"user", "estates", "meetings"})
-@ToString(exclude = {"user", "estates", "meetings"})
+@EqualsAndHashCode(exclude = {"user", "estates", "appointments"})
+@ToString(exclude = {"user", "estates", "appointments"})
 public class Seller {
 
     @Id
@@ -67,7 +67,7 @@ public class Seller {
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Meeting> meetings = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

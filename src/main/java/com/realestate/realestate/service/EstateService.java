@@ -30,7 +30,6 @@ import com.realestate.realestate.exception.estate.InvalidEstateTypeException;
 import com.realestate.realestate.repository.CategoryRepository;
 import com.realestate.realestate.repository.EstateRepository;
 import com.realestate.realestate.repository.SellerRepository;
-import com.realestate.realestate.repository.UserRepository;
 import com.realestate.realestate.util.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -44,8 +43,8 @@ public class EstateService {
         private final EstateRepository estateRepository;
         private final CategoryRepository categoryRepository;
         private final SellerRepository sellerRepository;
-        private final UserRepository userRepository;
         private final ImageService imageService;
+        private final SecurityUtil securityUtil;
 
         @Transactional(readOnly = true)
         public Page<EstateResponse> getAllEstates(int page, int size) {
@@ -83,7 +82,7 @@ public class EstateService {
         public EstateResponse createEstate(CreateEstateRequest request) {
                 log.info("Creating estate with name: {}", request.getName());
 
-                User currUser = SecurityUtil.getCurrentUser();
+                User currUser = securityUtil.getCurrentUser();
 
                 Seller seller = sellerRepository.findByUser(currUser)
                                 .orElseThrow(() -> new ResourceNotFoundException("Seller profile not found for user"));
@@ -135,7 +134,7 @@ public class EstateService {
         @Transactional(readOnly = true)
         public Page<EstateResponse> getMyEstates(int page, int size) {
                 log.info("Fetching my estates - page: {}, size: {}", page, size);
-                User currUser = SecurityUtil.getCurrentUser();
+                User currUser = securityUtil.getCurrentUser();
 
                 Seller seller = sellerRepository.findByUser(currUser)
                                 .orElseThrow(() -> new ResourceNotFoundException("Seller profile not found for user"));

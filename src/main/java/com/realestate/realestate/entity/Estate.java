@@ -68,7 +68,7 @@ public class Estate {
 
     @OneToMany(mappedBy = "estate", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Meeting> meetings = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
