@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realestate.realestate.dto.estate.CreateEstateRequest;
+import com.realestate.realestate.dto.estate.EstateBasicResponse;
 import com.realestate.realestate.dto.estate.EstateResponse;
 import com.realestate.realestate.enums.EstateType;
 import com.realestate.realestate.service.EstateService;
@@ -34,15 +35,15 @@ public class EstateController {
 
     private final EstateService estateService;
 
-    @GetMapping
-    public ResponseEntity<Page<EstateResponse>> getAllEstates(
+    @GetMapping("/public/all")
+    public ResponseEntity<Page<EstateBasicResponse>> getAllEstates(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<EstateResponse> estates = estateService.getAllEstates(page, size);
+        Page<EstateBasicResponse> estates = estateService.getAllEstates(page, size);
         return ResponseEntity.ok(estates);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/public/search")
     public ResponseEntity<Page<EstateResponse>> searchEstates(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) EstateType type,
@@ -62,7 +63,7 @@ public class EstateController {
         return ResponseEntity.ok(estates);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/public/{id}")
     public ResponseEntity<EstateResponse> getEstateById(@PathVariable Long id) {
         EstateResponse estate = estateService.getEstateById(id);
         return ResponseEntity.ok(estate);

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realestate.realestate.dto.estate.CreateEstateRequest;
+import com.realestate.realestate.dto.estate.EstateBasicResponse;
 import com.realestate.realestate.dto.estate.EstateResponse;
 import com.realestate.realestate.dto.seller.SellerResponse;
 import com.realestate.realestate.entity.Category;
@@ -47,11 +48,11 @@ public class EstateService {
         private final SecurityUtil securityUtil;
 
         @Transactional(readOnly = true)
-        public Page<EstateResponse> getAllEstates(int page, int size) {
+        public Page<EstateBasicResponse> getAllEstates(int page, int size) {
                 log.info("Fetching estates - page: {}, size: {}", page, size);
                 Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
                 Page<Estate> estatesPage = estateRepository.findByStatus(EstateStatus.APPROVED, pageable);
-                return estatesPage.map(this::buildEstateResponse);
+                return estatesPage.map(this::buildEstateBasicResponse);
         }
 
         @Transactional(readOnly = true)
@@ -149,16 +150,16 @@ public class EstateService {
                 log.info("Deleting estate with id: {}", id);
                 Estate estate = estateRepository.findById(id)
                                 .orElseThrow(() -> new ResourceNotFoundException("Estate not found with id: " + id));
-                
+
                 if (estate.getImages() != null && !estate.getImages().isEmpty()) {
                         List<String> imageUrls = estate.getImages().stream()
                                         .map(EstateImage::getS3url)
                                         .collect(Collectors.toList());
-                        
+
                         log.info("Deleting {} images from S3 for estate id: {}", imageUrls.size(), id);
                         imageService.deleteImages(imageUrls);
                 }
-                
+
                 estateRepository.delete(estate);
                 log.info("Estate and associated images deleted successfully with id: {}", id);
         }
@@ -272,7 +273,8 @@ public class EstateService {
                 SellerResponse sellerResponse = SellerResponse.builder()
                                 .id(estate.getSeller().getId())
                                 .userId(estate.getSeller().getUser().getId())
-                                .userName(estate.getSeller().getUser().getName().concat(" ").concat(estate.getSeller().getUser().getLastName()))
+                                .userName(estate.getSeller().getUser().getName().concat(" ")
+                                                .concat(estate.getSeller().getUser().getLastName()))
                                 .userEmail(estate.getSeller().getUser().getEmail())
                                 .userPhone(estate.getSeller().getUser().getContactNumber())
                                 .userProfilePicture(estate.getSeller().getUser().getProfilePicture())
@@ -301,6 +303,20 @@ public class EstateService {
                                 .characteristics(characteristicResponses)
                                 .createdAt(estate.getCreatedAt())
                                 .updatedAt(estate.getUpdatedAt())
+                                .build();
+        }
+
+        EstateBasicResponse buildEstateBasicResponse(Estate estate) {
+                String mainImageUrl = estate.getImages().isEmpty() ? null : estate.getImages().get(0).getS3url();
+
+                return EstateBasicResponse.builder()
+                                .id(estate.getId())
+                                .name(estate.getName())
+                                .price(estate.getPrice())
+                                .type(estate.getType())
+                                .city(estate.getCity())
+                                .address(estate.getAddress())
+                                .mainImageUrl(mainImageUrl)
                                 .build();
         }
 }

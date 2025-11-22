@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.realestate.realestate.dto.appointment.AppointmentResponse;
 import com.realestate.realestate.dto.appointment.CreateAppointmentRequest;
-import com.realestate.realestate.dto.estate.EstateBasicResponse;
 import com.realestate.realestate.dto.user.UserBasicResponse;
 import com.realestate.realestate.entity.Appointment;
 import com.realestate.realestate.entity.Estate;
@@ -37,6 +36,7 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final EstateRepository estateRepository;
     private final SecurityUtil securityUtil;
+    private final EstateService estateService;
 
     @Transactional
     public AppointmentResponse createAppointment(CreateAppointmentRequest request) {
@@ -206,7 +206,7 @@ public class AppointmentService {
         return AppointmentResponse.builder()
                 .id(appointment.getId())
                 .client(buildUserBasicResponse(appointment.getClient()))
-                .estate(buildEstateBasicResponse(appointment.getEstate()))
+                .estate(estateService.buildEstateBasicResponse(appointment.getEstate()))
                 .appointmentDate(appointment.getAppointmentDate())
                 .message(appointment.getMessage())
                 .sellerNotes(appointment.getSellerNotes())
@@ -222,20 +222,6 @@ public class AppointmentService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getContactNumber())
-                .build();
-    }
-
-    private EstateBasicResponse buildEstateBasicResponse(Estate estate) {
-        String mainImageUrl = estate.getImages().isEmpty() ? null : estate.getImages().get(0).getS3url();
-
-        return EstateBasicResponse.builder()
-                .id(estate.getId())
-                .name(estate.getName())
-                .price(estate.getPrice())
-                .type(estate.getType())
-                .city(estate.getCity())
-                .address(estate.getAddress())
-                .mainImageUrl(mainImageUrl)
                 .build();
     }
 }

@@ -37,3 +37,6 @@ build/
 .env.local
 .env.production
 *.env
+
+
+postman_collection.json
