@@ -35,18 +35,9 @@ public class EstateController {
 
     private final EstateService estateService;
 
-    @GetMapping("/public/all")
-    public ResponseEntity<Page<EstateBasicResponse>> getAllEstates(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<EstateBasicResponse> estates = estateService.getAllEstates(page, size);
-        return ResponseEntity.ok(estates);
-    }
-
-    @GetMapping("/public/search")
-    public ResponseEntity<Page<EstateResponse>> searchEstates(
+    @GetMapping("/public/sale")
+    public ResponseEntity<Page<EstateBasicResponse>> getEstatesForSale(
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) EstateType type,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Long categoryId,
@@ -54,12 +45,41 @@ public class EstateController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
+
         Sort.Direction direction = sortDir.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<EstateResponse> estates = estateService.searchEstates(
-                city, type, minPrice, maxPrice, categoryId, pageable);
+        Page<EstateBasicResponse> estates = estateService.searchEstates(
+                city, EstateType.SALE, minPrice, maxPrice, categoryId, pageable);
 
+        return ResponseEntity.ok(estates);
+    }
+
+    @GetMapping("/public/rent")
+    public ResponseEntity<Page<EstateBasicResponse>> getEstatesForRent(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir) {
+
+        Sort.Direction direction = sortDir.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<EstateBasicResponse> estates = estateService.searchEstates(
+                city, EstateType.RENT, minPrice, maxPrice, categoryId, pageable);
+
+        return ResponseEntity.ok(estates);
+    }
+
+    @GetMapping("/public/all")
+    public ResponseEntity<Page<EstateBasicResponse>> getAllEstates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<EstateBasicResponse> estates = estateService.getAllEstates(page, size);
         return ResponseEntity.ok(estates);
     }
 

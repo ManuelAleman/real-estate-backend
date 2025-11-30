@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,18 +54,21 @@ public class EstateService {
         }
 
         @Transactional(readOnly = true)
-        public Page<EstateResponse> searchEstates(
+        public Page<EstateBasicResponse> searchEstates(
                         String city,
                         EstateType type,
                         BigDecimal minPrice,
                         BigDecimal maxPrice,
                         Long categoryId,
                         Pageable pageable) {
+
                 log.info("Searching estates with filters - city: {}, type: {}, minPrice: {}, maxPrice: {}, categoryId: {}",
                                 city, type, minPrice, maxPrice, categoryId);
+
                 Page<Estate> estatesPage = estateRepository.searchEstates(city, type, minPrice, maxPrice, categoryId,
                                 pageable);
-                return estatesPage.map(this::buildEstateResponse);
+
+                return estatesPage.map(this::buildEstateBasicResponse);
         }
 
         @Transactional(readOnly = true)
