@@ -35,7 +35,7 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject("Verifica tu cuenta - Real Estate");
 
-            String verificationLink = baseUrl + "/verify-email.html?token=" + token;
+            String verificationLink = frontendUrl + "/verify-email?token=" + token;
 
             String htmlContent = buildVerificationEmailHtml(userName, verificationLink);
             helper.setText(htmlContent, true);
